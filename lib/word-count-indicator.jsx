@@ -24,14 +24,14 @@ export default class WordCountIndicator extends React.Component {
   // }
 
   render() {
-    var text = this._getDraftStringOnly(this.props.draft.body);
-    const wordCount = text.split(/\s+/).length;
+    var words = this._getDraftStrings(this.props.draft.body);
+    const wordCount = words.length
     return  (
       <div className="btn btn-toolbar">{wordCount}w</div>
     );
   }
 
-  _getDraftStringOnly(draftBody) {
+  _getDraftStrings(draftBody) {
     // This is hacky, wish there was a way to get just the draft portion
     // Create a DOM for manipulation
     var DOM = this._parseHTMLtoDOM(draftBody);
@@ -42,7 +42,11 @@ export default class WordCountIndicator extends React.Component {
     // Remove those silly nodes. They don't count.
     signature.map(function(node){node.remove()});
     gmailQuotes.map(function(node){node.remove()});
-    return DOM.documentElement.textContent;
+    // Get inner text of the html.
+    Fun fact innerText preserves word spacing where as textContent does not
+    var text = DOM.documentElement.innerText.split(/\s+/).filter(function(word){return word.length});
+    var words = text.split(/\s+/).filter(function(word){return word.length});
+    return words;
   }
 
   _parseHTMLtoDOM(str) {
